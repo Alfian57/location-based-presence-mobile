@@ -29,6 +29,27 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
+  test('normalizes mobile API base URL', () {
+    expect(
+      normalisasiBaseApiMobile('https://presensi.example.test'),
+      'https://presensi.example.test/api/mobile',
+    );
+    expect(
+      normalisasiBaseApiMobile('https://presensi.example.test/api'),
+      'https://presensi.example.test/api/mobile',
+    );
+    expect(
+      normalisasiBaseApiMobile('https://presensi.example.test/api/mobile'),
+      'https://presensi.example.test/api/mobile',
+    );
+    expect(
+      normalisasiBaseApiMobile(
+        'https://presensi.example.test/api/mobile/autentikasi/masuk',
+      ),
+      'https://presensi.example.test/api/mobile',
+    );
+  });
+
   testWidgets('renders login screen', (WidgetTester tester) async {
     await tester.pumpWidget(const PresensiApp());
     await tester.pumpAndSettle();

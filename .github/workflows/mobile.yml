@@ -78,6 +78,8 @@ jobs:
         env:
           MOBILE_API_BASE_URL: ${{ vars.MOBILE_API_BASE_URL }}
         run: |
+          # Boleh diisi domain root, /api, atau /api/mobile.
+          # Aplikasi akan menormalkan nilai ini ke endpoint /api/mobile.
           API_BASE_URL="${MOBILE_API_BASE_URL:-https://example.com/api/mobile}"
           flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
 

@@ -297,6 +297,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _submit() async {
+    if (_email.text.trim().isEmpty || _password.text.isEmpty) {
+      setState(() => _error = 'Email dan kata sandi wajib diisi.');
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
@@ -336,6 +341,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _resetPassword() async {
+    if (_email.text.trim().isEmpty) {
+      setState(() => _error = 'Isi email terlebih dahulu.');
+      return;
+    }
+
     setState(() => _error = null);
     try {
       final client = ApiClient(baseUrl: widget.apiBase);
@@ -372,15 +382,43 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const _LoginHero(),
-                        SizedBox(height: compact ? 14 : 20),
-                        const _AuthFacts(),
-                        SizedBox(height: compact ? 14 : 18),
+                        const _LoginHeader(),
+                        SizedBox(height: compact ? 18 : 24),
                         Panel(
-                          padding: EdgeInsets.all(compact ? 14 : 18),
+                          padding: EdgeInsets.all(compact ? 14 : 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              SegmentedButton<bool>(
+                                showSelectedIcon: false,
+                                style: ButtonStyle(
+                                  visualDensity: compact
+                                      ? VisualDensity.compact
+                                      : VisualDensity.standard,
+                                  padding: WidgetStatePropertyAll(
+                                    EdgeInsets.symmetric(
+                                      horizontal: compact ? 8 : 12,
+                                    ),
+                                  ),
+                                ),
+                                segments: const [
+                                  ButtonSegment<bool>(
+                                    value: false,
+                                    label: Text('Masuk'),
+                                  ),
+                                  ButtonSegment<bool>(
+                                    value: true,
+                                    label: Text('Aktivasi'),
+                                  ),
+                                ],
+                                selected: {_activationMode},
+                                onSelectionChanged: _loading
+                                    ? null
+                                    : (values) => setState(
+                                        () => _activationMode = values.first,
+                                      ),
+                              ),
+                              const SizedBox(height: 18),
                               Text(
                                 _activationMode
                                     ? 'Aktivasi akun'
@@ -399,38 +437,6 @@ class _LoginPageState extends State<LoginPage> {
                                   color: _warnaTeksRedup,
                                   height: 1.4,
                                 ),
-                              ),
-                              const SizedBox(height: 18),
-                              SegmentedButton<bool>(
-                                showSelectedIcon: false,
-                                style: ButtonStyle(
-                                  visualDensity: compact
-                                      ? VisualDensity.compact
-                                      : VisualDensity.standard,
-                                  padding: WidgetStatePropertyAll(
-                                    EdgeInsets.symmetric(
-                                      horizontal: compact ? 8 : 12,
-                                    ),
-                                  ),
-                                ),
-                                segments: const [
-                                  ButtonSegment<bool>(
-                                    value: false,
-                                    icon: Icon(Icons.login),
-                                    label: Text('Masuk'),
-                                  ),
-                                  ButtonSegment<bool>(
-                                    value: true,
-                                    icon: Icon(Icons.person_add_alt_1),
-                                    label: Text('Aktivasi'),
-                                  ),
-                                ],
-                                selected: {_activationMode},
-                                onSelectionChanged: _loading
-                                    ? null
-                                    : (values) => setState(
-                                        () => _activationMode = values.first,
-                                      ),
                               ),
                               if (_error != null) ...[
                                 const SizedBox(height: 16),
@@ -473,38 +479,28 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              FilledButton.icon(
+                              FilledButton(
                                 onPressed: _loading ? null : _submit,
-                                icon: _loading
+                                child: _loading
                                     ? const SizedBox.square(
-                                        dimension: 16,
+                                        dimension: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : Icon(
+                                    : Text(
                                         _activationMode
-                                            ? Icons.verified_outlined
-                                            : Icons.login,
+                                            ? 'Aktivasi & Masuk'
+                                            : 'Masuk',
                                       ),
-                                label: Text(
-                                  _activationMode
-                                      ? 'Aktivasi & Masuk'
-                                      : 'Masuk',
-                                ),
                               ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                alignment: WrapAlignment.end,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 8,
-                                runSpacing: 4,
-                                children: [
-                                  TextButton(
-                                    onPressed: _loading ? null : _resetPassword,
-                                    child: const Text('Reset Kata Sandi'),
-                                  ),
-                                ],
+                              const SizedBox(height: 10),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: _loading ? null : _resetPassword,
+                                  child: const Text('Reset Kata Sandi'),
+                                ),
                               ),
                             ],
                           ),
@@ -522,174 +518,54 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class _LoginHero extends StatelessWidget {
-  const _LoginHero();
+class _LoginHeader extends StatelessWidget {
+  const _LoginHeader();
 
   @override
   Widget build(BuildContext context) {
     final compact = layarXxs(context);
     final theme = Theme.of(context);
 
-    return Container(
-      padding: EdgeInsets.all(compact ? 14 : 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(_radiusKartu),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_warnaPrimerGelap, _warnaPrimer, _warnaBiru],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x220F766E),
-            blurRadius: 20,
-            offset: Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: compact ? 44 : 52,
-            height: compact ? 44 : 52,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(_radiusKartu),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: const Padding(
-              padding: EdgeInsets.all(6),
-              child: Image(
-                image: AssetImage(_assetLogoAplikasi),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          SizedBox(width: compact ? 10 : 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Presensi Guru',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontSize: compact ? 22 : null,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Masuk, aktivasi perangkat, dan validasi presensi dalam satu aplikasi.',
-                  maxLines: compact ? 3 : 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.86),
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AuthFacts extends StatelessWidget {
-  const _AuthFacts();
-
-  @override
-  Widget build(BuildContext context) {
-    const facts = [
-      _AuthFact(
-        icon: Icons.location_on_outlined,
-        label: 'Lokasi',
-        value: 'GPS',
-      ),
-      _AuthFact(
-        icon: Icons.verified_user_outlined,
-        label: 'Perangkat',
-        value: 'Terikat',
-      ),
-      _AuthFact(icon: Icons.schedule_outlined, label: 'Jadwal', value: 'Aktif'),
-    ];
-
-    if (layarXxs(context)) {
-      return Column(
-        children: [
-          for (var index = 0; index < facts.length; index++) ...[
-            facts[index],
-            if (index < facts.length - 1) const SizedBox(height: 8),
-          ],
-        ],
-      );
-    }
-
-    return Row(
+    return Column(
       children: [
-        for (var index = 0; index < facts.length; index++) ...[
-          Expanded(child: facts[index]),
-          if (index < facts.length - 1) const SizedBox(width: 10),
-        ],
+        Container(
+          width: compact ? 68 : 78,
+          height: compact ? 68 : 78,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(_radiusKartu),
+            border: Border.all(color: _warnaGaris),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: const Padding(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(_assetLogoAplikasi),
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        SizedBox(height: compact ? 12 : 14),
+        Text(
+          'Presensi Guru',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: _warnaTeksUtama,
+            fontSize: compact ? 22 : null,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
+        ),
+        const SizedBox(height: 6),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: const Text(
+            'Masuk dengan akun guru yang sudah terdaftar.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: _warnaTeksRedup, height: 1.35),
+          ),
+        ),
       ],
-    );
-  }
-}
-
-class _AuthFact extends StatelessWidget {
-  const _AuthFact({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(_radiusKartu),
-        border: Border.all(color: _warnaGaris),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: _warnaPrimer, size: 20),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: _warnaTeksRedup),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -2402,7 +2278,8 @@ class _HistorySummary extends StatelessWidget {
 }
 
 class ApiClient {
-  ApiClient({required this.baseUrl, this.token});
+  ApiClient({required String baseUrl, this.token})
+    : baseUrl = normalisasiBaseApiMobile(baseUrl);
 
   final String baseUrl;
   final String? token;
@@ -2895,6 +2772,42 @@ String dateOnly(DateTime value) {
 
 String monthOnly(DateTime value) {
   return '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}';
+}
+
+String normalisasiBaseApiMobile(String value) {
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) return _defaultApiBase;
+
+  final uri = Uri.parse(trimmed);
+  final segments = uri.pathSegments
+      .where((segment) => segment.isNotEmpty)
+      .toList();
+  final mobileApiIndex = _indexSegmenApiMobile(segments);
+
+  final List<String> normalizedSegments;
+  if (mobileApiIndex >= 0) {
+    normalizedSegments = segments.take(mobileApiIndex + 2).toList();
+  } else if (segments.isNotEmpty && segments.last == 'api') {
+    normalizedSegments = [...segments, 'mobile'];
+  } else {
+    normalizedSegments = [...segments, 'api', 'mobile'];
+  }
+
+  final normalized = uri.replace(
+    pathSegments: normalizedSegments,
+    query: null,
+    fragment: null,
+  );
+  return normalized.toString().replaceFirst(RegExp(r'/$'), '');
+}
+
+int _indexSegmenApiMobile(List<String> segments) {
+  for (var index = 0; index < segments.length - 1; index++) {
+    if (segments[index] == 'api' && segments[index + 1] == 'mobile') {
+      return index;
+    }
+  }
+  return -1;
 }
 
 String formatTanggalLengkap(DateTime value) {
