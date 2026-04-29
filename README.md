@@ -1,17 +1,23 @@
-# presensi_mobile
+# Presensi Mobile
 
-A new Flutter project.
+Aplikasi Android Presensi Guru berbasis Flutter.
 
-## Getting Started
+## CI/CD
 
-This project is a starting point for a Flutter application.
+Workflow berada di `.github/workflows/mobile.yml`.
 
-A few resources to get you started if this is your first Flutter project:
+- Pull request: menjalankan `dart analyze` dan `flutter test`.
+- Push ke `main` atau `master`: menjalankan test, build APK release, lalu membuat/memperbarui prerelease `mobile-latest` di tab GitHub Releases.
+- Push tag `mobile-v*` atau `v*`: menjalankan test, build APK release, lalu membuat GitHub Release sesuai tag.
+- Manual workflow dispatch: bisa membuat release dengan tag input, default `mobile-latest`.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Variable opsional:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- `MOBILE_API_BASE_URL`: URL API backend mobile. Jika tidak diisi, workflow memakai `https://example.com/api/mobile`.
+
+Contoh release final:
+
+```bash
+git tag mobile-v1.0.0
+git push origin mobile-v1.0.0
+```

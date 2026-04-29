@@ -37,4 +37,20 @@ void main() {
     expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Masuk'), findsOneWidget);
   });
+
+  testWidgets('login screen is usable on xxs phones', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const PresensiApp());
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Masuk'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
