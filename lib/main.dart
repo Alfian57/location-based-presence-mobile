@@ -2679,14 +2679,24 @@ Future<bool> konfirmasiTindakan(
             icon: Icon(ikon, color: _warnaPrimerGelap),
             title: Text(judul),
             content: Text(pesan),
+            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Batal'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(labelSetuju),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Batal'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(labelSetuju),
+                    ),
+                  ),
+                ],
               ),
             ],
           );
