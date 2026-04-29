@@ -11,6 +11,19 @@ const _defaultApiBase = String.fromEnvironment(
   defaultValue: 'http://10.0.2.2:8000/api/mobile',
 );
 
+const _warnaPrimer = Color(0xFF0F766E);
+const _warnaPrimerGelap = Color(0xFF134E4A);
+const _warnaAksen = Color(0xFFF59E0B);
+const _warnaBiru = Color(0xFF2563EB);
+const _warnaLatar = Color(0xFFF1F5F9);
+const _warnaPanel = Color(0xFFFFFFFF);
+const _warnaTeksUtama = Color(0xFF0F172A);
+const _warnaTeksRedup = Color(0xFF64748B);
+const _warnaGaris = Color(0xFFDDE7EF);
+const _radiusKartu = 8.0;
+const _assetLogoAplikasi = 'assets/images/app_logo.png';
+const _assetAvatarPlaceholder = 'assets/images/avatar_placeholder.png';
+
 void main() {
   runApp(const PresensiApp());
 }
@@ -23,7 +36,7 @@ class PresensiApp extends StatefulWidget {
 }
 
 class _PresensiAppState extends State<PresensiApp> {
-  String _apiBase = _defaultApiBase;
+  final String _apiBase = _defaultApiBase;
   String? _token;
   Map<String, dynamic>? _user;
   bool _booting = true;
@@ -37,9 +50,7 @@ class _PresensiAppState extends State<PresensiApp> {
   }
 
   Future<void> _bootstrap() async {
-    final storedBase = await PlatformBridge.readValue('api_base');
     final storedToken = await PlatformBridge.readValue('token');
-    _apiBase = storedBase?.isNotEmpty == true ? storedBase! : _defaultApiBase;
     _token = storedToken;
 
     if (_token != null) {
@@ -55,17 +66,11 @@ class _PresensiAppState extends State<PresensiApp> {
     if (mounted) setState(() => _booting = false);
   }
 
-  Future<void> _authenticate(
-    String token,
-    Map<String, dynamic> user,
-    String apiBase,
-  ) async {
+  Future<void> _authenticate(String token, Map<String, dynamic> user) async {
     await PlatformBridge.saveValue('token', token);
-    await PlatformBridge.saveValue('api_base', apiBase);
     setState(() {
       _token = token;
       _user = user;
-      _apiBase = apiBase;
     });
   }
 
@@ -88,28 +93,99 @@ class _PresensiAppState extends State<PresensiApp> {
       title: 'Presensi Guru',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F766E),
-          brightness: Brightness.light,
+        useMaterial3: true,
+        colorScheme:
+            ColorScheme.fromSeed(
+              seedColor: _warnaPrimer,
+              brightness: Brightness.light,
+            ).copyWith(
+              primary: _warnaPrimer,
+              secondary: _warnaAksen,
+              tertiary: _warnaBiru,
+              surface: _warnaPanel,
+            ),
+        scaffoldBackgroundColor: _warnaLatar,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: _warnaLatar,
+          foregroundColor: _warnaTeksUtama,
+          elevation: 0,
+          centerTitle: false,
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+            color: _warnaTeksUtama,
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
         ),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
         inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderRadius: BorderRadius.all(Radius.circular(_radiusKartu)),
+            borderSide: BorderSide(color: _warnaGaris),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(_radiusKartu)),
+            borderSide: BorderSide(color: _warnaGaris),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(_radiusKartu)),
+            borderSide: BorderSide(color: _warnaPrimer, width: 1.4),
           ),
           isDense: true,
+          labelStyle: TextStyle(color: _warnaTeksRedup),
+          prefixIconColor: _warnaPrimer,
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size.fromHeight(46),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_radiusKartu),
+            ),
+            textStyle: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(46),
+            foregroundColor: _warnaPrimerGelap,
+            side: const BorderSide(color: _warnaGaris),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_radiusKartu),
+            ),
+            textStyle: const TextStyle(fontWeight: FontWeight.w800),
+          ),
         ),
         snackBarTheme: const SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderRadius: BorderRadius.all(Radius.circular(_radiusKartu)),
+          ),
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Colors.white,
+          indicatorColor: _warnaPrimer.withValues(alpha: 0.12),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.black.withValues(alpha: 0.10),
+          labelTextStyle: WidgetStateProperty.resolveWith(
+            (states) => TextStyle(
+              color: states.contains(WidgetState.selected)
+                  ? _warnaPrimerGelap
+                  : _warnaTeksRedup,
+              fontSize: 11,
+              fontWeight: states.contains(WidgetState.selected)
+                  ? FontWeight.w800
+                  : FontWeight.w600,
+            ),
           ),
         ),
         cardTheme: const CardThemeData(
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            side: BorderSide(color: Color(0xFFE2E8F0)),
+            borderRadius: BorderRadius.all(Radius.circular(_radiusKartu)),
+            side: BorderSide(color: _warnaGaris),
           ),
         ),
       ),
@@ -132,7 +208,61 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(_radiusKartu),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _warnaPrimer.withValues(alpha: 0.14),
+                      blurRadius: 18,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Image(
+                    image: AssetImage(_assetLogoAplikasi),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Presensi Guru',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: _warnaTeksUtama,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Menyiapkan sesi aplikasi',
+                style: TextStyle(color: _warnaTeksRedup),
+              ),
+              const SizedBox(height: 18),
+              const SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -144,11 +274,7 @@ class LoginPage extends StatefulWidget {
   });
 
   final String apiBase;
-  final Future<void> Function(
-    String token,
-    Map<String, dynamic> user,
-    String apiBase,
-  )
+  final Future<void> Function(String token, Map<String, dynamic> user)
   onAuthenticated;
 
   @override
@@ -156,20 +282,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  late final TextEditingController _apiBase = TextEditingController(
-    text: widget.apiBase,
-  );
-  final _email = TextEditingController(text: 'guru@presensi.test');
-  final _password = TextEditingController(text: 'password');
+  final _email = TextEditingController();
+  final _password = TextEditingController();
   bool _activationMode = false;
-  bool _showApiSettings = false;
   bool _showPassword = false;
   bool _loading = false;
   String? _error;
 
   @override
   void dispose() {
-    _apiBase.dispose();
     _email.dispose();
     _password.dispose();
     super.dispose();
@@ -183,7 +304,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final device = await PlatformBridge.deviceInfo();
-      final client = ApiClient(baseUrl: _apiBase.text.trim());
+      final client = ApiClient(baseUrl: widget.apiBase);
       final response =
           await client.post(
                 _activationMode
@@ -202,7 +323,6 @@ class _LoginPageState extends State<LoginPage> {
       await widget.onAuthenticated(
         response['token'] as String,
         Map<String, dynamic>.from(response['pengguna'] as Map),
-        _apiBase.text.trim(),
       );
     } on ApiException catch (error) {
       setState(() => _error = error.message);
@@ -218,7 +338,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _resetPassword() async {
     setState(() => _error = null);
     try {
-      final client = ApiClient(baseUrl: _apiBase.text.trim());
+      final client = ApiClient(baseUrl: widget.apiBase);
       final response = await client.post(
         '/autentikasi/reset-kata-sandi',
         body: {'email': _email.text.trim()},
@@ -252,223 +372,141 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: compact ? 44 : 52,
-                              height: compact ? 44 : 52,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF0F766E),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0x220F766E),
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.fingerprint,
-                                color: Colors.white,
-                                size: 26,
-                              ),
-                            ),
-                            SizedBox(width: compact ? 10 : 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Presensi Guru',
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  const Text(
-                                    'Aplikasi kehadiran guru',
-                                    style: TextStyle(color: Color(0xFF64748B)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        const _LoginHero(),
                         SizedBox(height: compact ? 14 : 20),
                         const _AuthFacts(),
                         SizedBox(height: compact ? 14 : 18),
-                        Card(
-                          child: Padding(
-                            padding: EdgeInsets.all(compact ? 14 : 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  _activationMode
-                                      ? 'Aktivasi akun'
-                                      : 'Masuk akun',
-                                  style: theme.textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0,
-                                  ),
+                        Panel(
+                          padding: EdgeInsets.all(compact ? 14 : 18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                _activationMode
+                                    ? 'Aktivasi akun'
+                                    : 'Masuk akun',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0,
                                 ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  _activationMode
-                                      ? 'Gunakan email dan kata sandi dari admin sekolah.'
-                                      : 'Gunakan akun guru yang sudah terdaftar.',
-                                  style: const TextStyle(
-                                    color: Color(0xFF64748B),
-                                    height: 1.4,
-                                  ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _activationMode
+                                    ? 'Gunakan email dan kata sandi dari admin sekolah.'
+                                    : 'Gunakan akun guru yang sudah terdaftar.',
+                                style: const TextStyle(
+                                  color: _warnaTeksRedup,
+                                  height: 1.4,
                                 ),
-                                const SizedBox(height: 18),
-                                SegmentedButton<bool>(
-                                  showSelectedIcon: false,
-                                  style: ButtonStyle(
-                                    visualDensity: compact
-                                        ? VisualDensity.compact
-                                        : VisualDensity.standard,
-                                    padding: WidgetStatePropertyAll(
-                                      EdgeInsets.symmetric(
-                                        horizontal: compact ? 8 : 12,
-                                      ),
+                              ),
+                              const SizedBox(height: 18),
+                              SegmentedButton<bool>(
+                                showSelectedIcon: false,
+                                style: ButtonStyle(
+                                  visualDensity: compact
+                                      ? VisualDensity.compact
+                                      : VisualDensity.standard,
+                                  padding: WidgetStatePropertyAll(
+                                    EdgeInsets.symmetric(
+                                      horizontal: compact ? 8 : 12,
                                     ),
                                   ),
-                                  segments: const [
-                                    ButtonSegment<bool>(
-                                      value: false,
-                                      icon: Icon(Icons.login),
-                                      label: Text('Masuk'),
-                                    ),
-                                    ButtonSegment<bool>(
-                                      value: true,
-                                      icon: Icon(Icons.person_add_alt_1),
-                                      label: Text('Aktivasi'),
-                                    ),
-                                  ],
-                                  selected: {_activationMode},
-                                  onSelectionChanged: _loading
-                                      ? null
-                                      : (values) => setState(
-                                          () => _activationMode = values.first,
-                                        ),
                                 ),
-                                if (_error != null) ...[
-                                  const SizedBox(height: 16),
-                                  ErrorBox(message: _error!),
+                                segments: const [
+                                  ButtonSegment<bool>(
+                                    value: false,
+                                    icon: Icon(Icons.login),
+                                    label: Text('Masuk'),
+                                  ),
+                                  ButtonSegment<bool>(
+                                    value: true,
+                                    icon: Icon(Icons.person_add_alt_1),
+                                    label: Text('Aktivasi'),
+                                  ),
                                 ],
+                                selected: {_activationMode},
+                                onSelectionChanged: _loading
+                                    ? null
+                                    : (values) => setState(
+                                        () => _activationMode = values.first,
+                                      ),
+                              ),
+                              if (_error != null) ...[
                                 const SizedBox(height: 16),
-                                TextField(
-                                  controller: _email,
-                                  keyboardType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Email',
-                                    prefixIcon: Icon(Icons.mail_outline),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                TextField(
-                                  controller: _password,
-                                  obscureText: !_showPassword,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) {
-                                    if (!_loading) _submit();
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Kata Sandi',
-                                    prefixIcon: const Icon(Icons.lock_outline),
-                                    suffixIcon: IconButton(
-                                      tooltip: _showPassword
-                                          ? 'Sembunyikan kata sandi'
-                                          : 'Tampilkan kata sandi',
-                                      onPressed: () => setState(
-                                        () => _showPassword = !_showPassword,
-                                      ),
-                                      icon: Icon(
-                                        _showPassword
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                AnimatedCrossFade(
-                                  firstChild: const SizedBox.shrink(),
-                                  secondChild: Padding(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    child: TextField(
-                                      controller: _apiBase,
-                                      keyboardType: TextInputType.url,
-                                      decoration: const InputDecoration(
-                                        labelText: 'URL API',
-                                        prefixIcon: Icon(Icons.dns_outlined),
-                                      ),
-                                    ),
-                                  ),
-                                  crossFadeState: _showApiSettings
-                                      ? CrossFadeState.showSecond
-                                      : CrossFadeState.showFirst,
-                                  duration: const Duration(milliseconds: 180),
-                                  firstCurve: Curves.easeOut,
-                                  secondCurve: Curves.easeOut,
-                                ),
-                                const SizedBox(height: 16),
-                                FilledButton.icon(
-                                  onPressed: _loading ? null : _submit,
-                                  icon: _loading
-                                      ? const SizedBox.square(
-                                          dimension: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : Icon(
-                                          _activationMode
-                                              ? Icons.verified_outlined
-                                              : Icons.login,
-                                        ),
-                                  label: Text(
-                                    _activationMode
-                                        ? 'Aktivasi & Masuk'
-                                        : 'Masuk',
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  alignment: WrapAlignment.spaceBetween,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: 8,
-                                  runSpacing: 4,
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: _loading
-                                          ? null
-                                          : () => setState(
-                                              () => _showApiSettings =
-                                                  !_showApiSettings,
-                                            ),
-                                      icon: const Icon(Icons.tune),
-                                      label: Text(
-                                        _showApiSettings
-                                            ? 'Tutup Server'
-                                            : 'Server API',
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: _loading
-                                          ? null
-                                          : _resetPassword,
-                                      child: const Text('Reset Kata Sandi'),
-                                    ),
-                                  ],
-                                ),
+                                ErrorBox(message: _error!),
                               ],
-                            ),
+                              const SizedBox(height: 16),
+                              TextField(
+                                controller: _email,
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  prefixIcon: Icon(Icons.mail_outline),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _password,
+                                obscureText: !_showPassword,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) {
+                                  if (!_loading) _submit();
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Kata Sandi',
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    tooltip: _showPassword
+                                        ? 'Sembunyikan kata sandi'
+                                        : 'Tampilkan kata sandi',
+                                    onPressed: () => setState(
+                                      () => _showPassword = !_showPassword,
+                                    ),
+                                    icon: Icon(
+                                      _showPassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: _loading ? null : _submit,
+                                icon: _loading
+                                    ? const SizedBox.square(
+                                        dimension: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(
+                                        _activationMode
+                                            ? Icons.verified_outlined
+                                            : Icons.login,
+                                      ),
+                                label: Text(
+                                  _activationMode
+                                      ? 'Aktivasi & Masuk'
+                                      : 'Masuk',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                alignment: WrapAlignment.end,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  TextButton(
+                                    onPressed: _loading ? null : _resetPassword,
+                                    child: const Text('Reset Kata Sandi'),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -479,6 +517,86 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _LoginHero extends StatelessWidget {
+  const _LoginHero();
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = layarXxs(context);
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: EdgeInsets.all(compact ? 14 : 18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_warnaPrimerGelap, _warnaPrimer, _warnaBiru],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x220F766E),
+            blurRadius: 20,
+            offset: Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: compact ? 44 : 52,
+            height: compact ? 44 : 52,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(_radiusKartu),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: const Padding(
+              padding: EdgeInsets.all(6),
+              child: Image(
+                image: AssetImage(_assetLogoAplikasi),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          SizedBox(width: compact ? 10 : 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Presensi Guru',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontSize: compact ? 22 : null,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Masuk, aktivasi perangkat, dan validasi presensi dalam satu aplikasi.',
+                  maxLines: compact ? 3 : 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.86),
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -542,13 +660,20 @@ class _AuthFact extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: _warnaGaris),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFF0F766E), size: 20),
+          Icon(icon, color: _warnaPrimer, size: 20),
           const SizedBox(height: 8),
           Text(
             value,
@@ -561,7 +686,7 @@ class _AuthFact extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+            style: const TextStyle(fontSize: 12, color: _warnaTeksRedup),
           ),
         ],
       ),
@@ -590,6 +715,19 @@ class AuthenticatedShell extends StatefulWidget {
 class _AuthenticatedShellState extends State<AuthenticatedShell> {
   int _index = 0;
 
+  Future<void> _confirmLogout() async {
+    final confirmed = await konfirmasiTindakan(
+      context,
+      judul: 'Keluar dari akun?',
+      pesan: 'Sesi presensi di perangkat ini akan ditutup.',
+      labelSetuju: 'Keluar',
+      ikon: Icons.logout,
+    );
+    if (confirmed && mounted) {
+      await widget.onLogout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final compact = layarXxs(context);
@@ -604,14 +742,56 @@ class _AuthenticatedShellState extends State<AuthenticatedShell> {
         onUserChanged: widget.onUserChanged,
       ),
     ];
+    const titles = ['Presensi', 'Pengajuan Izin', 'Riwayat', 'Profil'];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Presensi Guru', overflow: TextOverflow.ellipsis),
+        titleSpacing: compact ? 8 : 16,
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(_radiusKartu),
+                border: Border.all(color: _warnaGaris),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Image(
+                  image: AssetImage(_assetLogoAplikasi),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Presensi Guru', overflow: TextOverflow.ellipsis),
+                  Text(
+                    titles[_index],
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _warnaTeksRedup,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Keluar',
-            onPressed: widget.onLogout,
+            onPressed: _confirmLogout,
             icon: const Icon(Icons.logout),
           ),
         ],
@@ -744,79 +924,83 @@ class _HomePageState extends State<HomePage> {
             (school['longitude'] as num).toDouble(),
           )
         : null;
+    final radius = (school?['radius_meter'] as num?)?.toInt();
+    final insideRadius = distance != null && radius != null
+        ? distance <= radius
+        : null;
+    final attendanceStatus =
+        (_attendance?['status'] as String?) ?? 'belum_presensi';
 
     return RefreshIndicator(
       onRefresh: _refresh,
       child: ListView(
         padding: paddingHalaman(context),
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Presensi Hari Ini',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-              IconButton(
-                onPressed: _loading ? null : _refresh,
-                icon: const Icon(Icons.refresh),
-                tooltip: 'Refresh',
-              ),
-            ],
+          PageHeader(
+            icon: Icons.today_outlined,
+            title: 'Presensi Hari Ini',
+            subtitle: formatTanggalLengkap(DateTime.now()),
+            trailing: IconButton.filledTonal(
+              onPressed: _loading ? null : _refresh,
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Muat ulang',
+            ),
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
             ErrorBox(message: _error!),
           ],
           const SizedBox(height: 12),
+          _AttendanceHero(
+            status: attendanceStatus,
+            masuk: formatIsoTime(_attendance?['jam_masuk_pada'] as String?),
+            pulang: formatIsoTime(_attendance?['jam_pulang_pada'] as String?),
+            loading: _loading,
+          ),
+          const SizedBox(height: 12),
+          ResponsivePair(
+            first: MetricTile(
+              icon: Icons.business_center_outlined,
+              label: 'Jadwal Kerja',
+              value: shift?['nama']?.toString() ?? '-',
+              color: _warnaPrimer,
+            ),
+            second: MetricTile(
+              icon: Icons.schedule_outlined,
+              label: 'Jam Kerja',
+              value: shift == null
+                  ? '-'
+                  : '${shift['jam_masuk']} - ${shift['jam_pulang']}',
+              color: _warnaBiru,
+            ),
+          ),
+          const SizedBox(height: 12),
           Panel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    StatusChip(
-                      status:
-                          (_attendance?['status'] as String?) ??
-                          'belum_presensi',
-                    ),
-                    const Spacer(),
-                    if (_loading)
-                      const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                  ],
+                const SectionTitle(
+                  icon: Icons.fingerprint,
+                  title: 'Aksi Presensi',
+                  subtitle: 'Gunakan sesuai jadwal sekolah.',
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 ResponsivePair(
-                  first: LabeledValue(
-                    label: 'Presensi Masuk',
-                    value: formatIsoTime(
-                      _attendance?['jam_masuk_pada'] as String?,
-                    ),
+                  stretchNarrow: true,
+                  first: FilledButton.icon(
+                    onPressed: _clocking ? null : () => _clock('masuk'),
+                    icon: _clocking
+                        ? const SizedBox.square(
+                            dimension: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.login),
+                    label: const Text('Presensi Masuk'),
                   ),
-                  second: LabeledValue(
-                    label: 'Presensi Pulang',
-                    value: formatIsoTime(
-                      _attendance?['jam_pulang_pada'] as String?,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ResponsivePair(
-                  first: LabeledValue(
-                    label: 'Jadwal Kerja',
-                    value: shift?['nama']?.toString() ?? '-',
-                  ),
-                  second: LabeledValue(
-                    label: 'Jam Kerja',
-                    value: shift == null
-                        ? '-'
-                        : '${shift['jam_masuk']} - ${shift['jam_pulang']}',
+                  second: OutlinedButton.icon(
+                    onPressed: _clocking ? null : () => _clock('pulang'),
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Presensi Pulang'),
                   ),
                 ),
               ],
@@ -827,56 +1011,65 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Lokasi',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+                SectionTitle(
+                  icon: Icons.location_on_outlined,
+                  title: 'Validasi Lokasi',
+                  subtitle: school?['nama']?.toString() ?? 'Lokasi sekolah',
+                  trailing: LocationStatusPill(
+                    insideRadius: insideRadius,
+                    mocked: _location?.mockedLocation == true,
                   ),
                 ),
                 const SizedBox(height: 12),
-                LabeledValue(
-                  label: 'Sekolah',
-                  value: school?['nama']?.toString() ?? '-',
-                ),
-                const SizedBox(height: 10),
                 ResponsivePair(
-                  first: LabeledValue(
+                  first: MetricTile(
+                    icon: Icons.gps_fixed_outlined,
                     label: 'Akurasi GPS',
                     value: _location == null ? '-' : '${_location!.accuracy} m',
+                    color: _warnaPrimer,
+                    compact: true,
                   ),
-                  second: LabeledValue(
-                    label: 'Jarak',
+                  second: MetricTile(
+                    icon: Icons.social_distance_outlined,
+                    label: 'Jarak Sekolah',
                     value: distance == null ? '-' : '$distance m',
+                    color: insideRadius == false ? _warnaAksen : _warnaBiru,
+                    compact: true,
                   ),
                 ),
                 const SizedBox(height: 10),
                 ResponsivePair(
-                  first: LabeledValue(
+                  first: MetricTile(
+                    icon: Icons.shield_outlined,
                     label: 'Lokasi Palsu',
                     value: _location?.mockedLocation == true
                         ? 'Terdeteksi'
                         : 'Tidak',
+                    color: _location?.mockedLocation == true
+                        ? const Color(0xFFB91C1C)
+                        : _warnaPrimer,
+                    compact: true,
                   ),
-                  second: LabeledValue(
-                    label: 'Radius',
-                    value: school == null ? '-' : '${school['radius_meter']} m',
+                  second: MetricTile(
+                    icon: Icons.radio_button_checked,
+                    label: 'Radius Diizinkan',
+                    value: radius == null ? '-' : '$radius m',
+                    color: _warnaAksen,
+                    compact: true,
                   ),
                 ),
+                if (insideRadius == false || _location?.mockedLocation == true)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: InlineNotice(
+                      icon: Icons.warning_amber_outlined,
+                      message: _location?.mockedLocation == true
+                          ? 'Lokasi palsu terdeteksi. Presensi bisa ditolak oleh sistem.'
+                          : 'Posisi Anda berada di luar radius sekolah.',
+                      color: const Color(0xFFB45309),
+                    ),
+                  ),
               ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ResponsivePair(
-            stretchNarrow: true,
-            first: FilledButton.icon(
-              onPressed: _clocking ? null : () => _clock('masuk'),
-              icon: const Icon(Icons.login),
-              label: const Text('Presensi Masuk'),
-            ),
-            second: OutlinedButton.icon(
-              onPressed: _clocking ? null : () => _clock('pulang'),
-              icon: const Icon(Icons.logout),
-              label: const Text('Presensi Pulang'),
             ),
           ),
         ],
@@ -911,8 +1104,19 @@ class _LeavePageState extends State<LeavePage> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _start.dispose();
+    _end.dispose();
+    _reason.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final response =
           await widget.client.get('/pengajuan-izin') as Map<String, dynamic>;
@@ -971,11 +1175,15 @@ class _LeavePageState extends State<LeavePage> {
       child: ListView(
         padding: paddingHalaman(context),
         children: [
-          Text(
-            'Izin, Sakit, Cuti',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          PageHeader(
+            icon: Icons.assignment_outlined,
+            title: 'Izin, Sakit, Cuti',
+            subtitle: 'Ajukan ketidakhadiran dengan dokumen pendukung.',
+            trailing: IconButton.filledTonal(
+              onPressed: _loading ? null : _load,
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Muat ulang',
+            ),
           ),
           if (_error != null) ...[
             const SizedBox(height: 10),
@@ -984,18 +1192,37 @@ class _LeavePageState extends State<LeavePage> {
           const SizedBox(height: 12),
           Panel(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DropdownButtonFormField<String>(
-                  initialValue: _type,
-                  decoration: const InputDecoration(
-                    labelText: 'Jenis Pengajuan',
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'izin', child: Text('Izin')),
-                    DropdownMenuItem(value: 'sakit', child: Text('Sakit')),
-                    DropdownMenuItem(value: 'cuti', child: Text('Cuti')),
+                const SectionTitle(
+                  icon: Icons.edit_calendar_outlined,
+                  title: 'Form Pengajuan',
+                  subtitle: 'Isi tanggal dan alasan secara singkat.',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    LeaveTypeChip(
+                      label: 'Izin',
+                      icon: Icons.event_available_outlined,
+                      selected: _type == 'izin',
+                      onSelected: () => setState(() => _type = 'izin'),
+                    ),
+                    LeaveTypeChip(
+                      label: 'Sakit',
+                      icon: Icons.local_hospital_outlined,
+                      selected: _type == 'sakit',
+                      onSelected: () => setState(() => _type = 'sakit'),
+                    ),
+                    LeaveTypeChip(
+                      label: 'Cuti',
+                      icon: Icons.beach_access_outlined,
+                      selected: _type == 'cuti',
+                      onSelected: () => setState(() => _type = 'cuti'),
+                    ),
                   ],
-                  onChanged: (value) => setState(() => _type = value ?? 'izin'),
                 ),
                 const SizedBox(height: 12),
                 ResponsivePair(
@@ -1003,13 +1230,19 @@ class _LeavePageState extends State<LeavePage> {
                     controller: _start,
                     readOnly: true,
                     onTap: () => _pickDate(_start),
-                    decoration: const InputDecoration(labelText: 'Mulai'),
+                    decoration: const InputDecoration(
+                      labelText: 'Mulai',
+                      prefixIcon: Icon(Icons.calendar_today_outlined),
+                    ),
                   ),
                   second: TextField(
                     controller: _end,
                     readOnly: true,
                     onTap: () => _pickDate(_end),
-                    decoration: const InputDecoration(labelText: 'Selesai'),
+                    decoration: const InputDecoration(
+                      labelText: 'Selesai',
+                      prefixIcon: Icon(Icons.event_outlined),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1017,26 +1250,18 @@ class _LeavePageState extends State<LeavePage> {
                   controller: _reason,
                   minLines: 3,
                   maxLines: 5,
-                  decoration: const InputDecoration(labelText: 'Alasan'),
+                  decoration: const InputDecoration(
+                    labelText: 'Alasan',
+                    prefixIcon: Icon(Icons.notes_outlined),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ResponsivePair(
                   stretchNarrow: true,
-                  first: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 11,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Text(
-                      _document?.name ?? 'Belum ada dokumen',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  first: DocumentTile(
+                    name: _document?.name ?? 'Belum ada dokumen',
+                    attached: _document != null,
                   ),
                   second: OutlinedButton.icon(
                     onPressed: _pickDocument,
@@ -1057,11 +1282,10 @@ class _LeavePageState extends State<LeavePage> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Status Pengajuan',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          SectionTitle(
+            icon: Icons.fact_check_outlined,
+            title: 'Status Pengajuan',
+            subtitle: '${_items.length} pengajuan tersimpan',
           ),
           const SizedBox(height: 8),
           if (_loading)
@@ -1071,37 +1295,18 @@ class _LeavePageState extends State<LeavePage> {
                 child: CircularProgressIndicator(),
               ),
             )
+          else if (_items.isEmpty)
+            const EmptyState(
+              icon: Icons.assignment_late_outlined,
+              title: 'Belum ada pengajuan',
+              message: 'Pengajuan izin, sakit, atau cuti akan tampil di sini.',
+            )
           else
             ..._items.map((raw) {
               final item = Map<String, dynamic>.from(raw as Map);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Panel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          StatusChip(status: item['status'] as String),
-                          Text(
-                            statusLabel(item['jenis'] as String),
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${item['tanggal_mulai']} s/d ${item['tanggal_selesai']}',
-                        style: const TextStyle(color: Color(0xFF64748B)),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(item['alasan'] as String),
-                    ],
-                  ),
-                ),
+                child: SubmissionCard(item: item),
               );
             }),
         ],
@@ -1131,6 +1336,12 @@ class _HistoryPageState extends State<HistoryPage> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _month.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     setState(() {
       _loading = true;
@@ -1152,31 +1363,79 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final statusCounts = <String, int>{};
+    for (final raw in _items) {
+      final item = Map<String, dynamic>.from(raw as Map);
+      final status = item['status']?.toString() ?? '-';
+      statusCounts[status] = (statusCounts[status] ?? 0) + 1;
+    }
+
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
         padding: paddingHalaman(context),
         children: [
-          Text(
-            'Riwayat Presensi',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          PageHeader(
+            icon: Icons.history_outlined,
+            title: 'Riwayat Presensi',
+            subtitle: 'Pantau rekap kehadiran bulanan.',
+            trailing: IconButton.filledTonal(
+              onPressed: _loading ? null : _load,
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Muat ulang',
+            ),
           ),
           const SizedBox(height: 12),
-          ResponsivePair(
-            stretchNarrow: true,
-            first: TextField(
-              controller: _month,
-              decoration: const InputDecoration(labelText: 'Bulan YYYY-MM'),
+          Panel(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionTitle(
+                  icon: Icons.filter_alt_outlined,
+                  title: 'Filter Bulan',
+                  subtitle: 'Format bulan menggunakan YYYY-MM.',
+                ),
+                const SizedBox(height: 12),
+                ResponsivePair(
+                  stretchNarrow: true,
+                  first: TextField(
+                    controller: _month,
+                    decoration: const InputDecoration(
+                      labelText: 'Bulan YYYY-MM',
+                      prefixIcon: Icon(Icons.calendar_month_outlined),
+                    ),
+                  ),
+                  second: FilledButton.icon(
+                    onPressed: _loading ? null : _load,
+                    icon: const Icon(Icons.search),
+                    label: const Text('Filter'),
+                  ),
+                ),
+              ],
             ),
-            second: FilledButton(onPressed: _load, child: const Text('Filter')),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
             ErrorBox(message: _error!),
           ],
           const SizedBox(height: 12),
+          if (!_loading && _items.isNotEmpty) ...[
+            ResponsivePair(
+              first: MetricTile(
+                icon: Icons.event_available_outlined,
+                label: 'Tepat Waktu',
+                value: '${statusCounts['hadir'] ?? 0} hari',
+                color: _warnaPrimer,
+              ),
+              second: MetricTile(
+                icon: Icons.warning_amber_outlined,
+                label: 'Terlambat',
+                value: '${statusCounts['terlambat'] ?? 0} hari',
+                color: _warnaAksen,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (_loading)
             const Center(
               child: Padding(
@@ -1185,36 +1444,17 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             )
           else if (_items.isEmpty)
-            const Panel(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text('Belum ada riwayat.'),
-                ),
-              ),
+            const EmptyState(
+              icon: Icons.history_toggle_off_outlined,
+              title: 'Belum ada riwayat',
+              message: 'Data presensi untuk bulan ini belum tersedia.',
             )
           else
             ..._items.map((raw) {
               final item = Map<String, dynamic>.from(raw as Map);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Panel(
-                  child: layarXxs(context)
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _HistorySummary(item: item),
-                            const SizedBox(height: 10),
-                            StatusChip(status: item['status'] as String),
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Expanded(child: _HistorySummary(item: item)),
-                            StatusChip(status: item['status'] as String),
-                          ],
-                        ),
-                ),
+                child: HistoryCard(item: item),
               );
             }),
         ],
@@ -1248,6 +1488,19 @@ class _ProfilePageState extends State<ProfilePage> {
       ? {}
       : Map<String, dynamic>.from(widget.user['guru'] as Map);
 
+  Future<void> _confirmLogout() async {
+    final confirmed = await konfirmasiTindakan(
+      context,
+      judul: 'Keluar dari akun?',
+      pesan: 'Anda perlu masuk lagi untuk mencatat presensi berikutnya.',
+      labelSetuju: 'Keluar',
+      ikon: Icons.logout,
+    );
+    if (confirmed && mounted) {
+      await widget.onLogout();
+    }
+  }
+
   Future<void> _setNotifications(bool value) async {
     setState(() => _saving = true);
     try {
@@ -1278,60 +1531,846 @@ class _ProfilePageState extends State<ProfilePage> {
     return ListView(
       padding: paddingHalaman(context),
       children: [
-        Text(
-          'Profil',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        PageHeader(
+          icon: Icons.person_outline,
+          title: 'Profil',
+          subtitle: 'Data akun dan pengaturan aplikasi.',
         ),
+        const SizedBox(height: 12),
+        ProfileHero(user: widget.user, teacher: teacher),
         const SizedBox(height: 12),
         Panel(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              LabeledValue(
-                label: 'Nama',
-                value: widget.user['nama']?.toString() ?? '-',
+              const SectionTitle(
+                icon: Icons.badge_outlined,
+                title: 'Informasi Guru',
+                subtitle: 'Data ini dikelola oleh admin sekolah.',
+              ),
+              const SizedBox(height: 12),
+              ResponsivePair(
+                first: MetricTile(
+                  icon: Icons.badge_outlined,
+                  label: 'NIP',
+                  value:
+                      teacher['nip']?.toString() ??
+                      widget.user['nomor_pegawai']?.toString() ??
+                      '-',
+                  color: _warnaPrimer,
+                  compact: true,
+                ),
+                second: MetricTile(
+                  icon: Icons.menu_book_outlined,
+                  label: 'Mata Pelajaran',
+                  value: teacher['mata_pelajaran']?.toString() ?? '-',
+                  color: _warnaBiru,
+                  compact: true,
+                ),
               ),
               const SizedBox(height: 10),
-              LabeledValue(
-                label: 'Email',
-                value: widget.user['email']?.toString() ?? '-',
-              ),
-              const SizedBox(height: 10),
-              LabeledValue(
-                label: 'NIP',
-                value:
-                    teacher['nip']?.toString() ??
-                    widget.user['nomor_pegawai']?.toString() ??
-                    '-',
-              ),
-              const SizedBox(height: 10),
-              LabeledValue(
-                label: 'Mata Pelajaran',
-                value: teacher['mata_pelajaran']?.toString() ?? '-',
-              ),
-              const SizedBox(height: 10),
-              LabeledValue(
-                label: 'Jadwal',
+              MetricTile(
+                icon: Icons.schedule_outlined,
+                label: 'Jadwal Kerja',
                 value: teacher['jadwal_kerja']?.toString() ?? '-',
+                color: _warnaAksen,
+                compact: true,
               ),
-              SwitchListTile(
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Panel(
+          child: Column(
+            children: [
+              SwitchListTile.adaptive(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Notifikasi'),
+                secondary: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: _warnaPrimer.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(_radiusKartu),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_active_outlined,
+                    color: _warnaPrimerGelap,
+                    size: 20,
+                  ),
+                ),
+                title: const Text(
+                  'Notifikasi',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+                subtitle: const Text(
+                  'Pengingat presensi dan status pengajuan.',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 value: teacher['notifikasi_aktif'] == true,
                 onChanged: _saving ? null : _setNotifications,
               ),
+              if (_saving)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: LinearProgressIndicator(minHeight: 3),
+                ),
             ],
           ),
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
-          onPressed: widget.onLogout,
+          onPressed: _confirmLogout,
           icon: const Icon(Icons.logout),
           label: const Text('Keluar'),
         ),
       ],
+    );
+  }
+}
+
+class PageHeader extends StatelessWidget {
+  const PageHeader({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = layarXxs(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: compact ? 40 : 44,
+          height: compact ? 40 : 44,
+          decoration: BoxDecoration(
+            color: _warnaPrimer.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(_radiusKartu),
+          ),
+          child: Icon(icon, color: _warnaPrimerGelap, size: compact ? 20 : 22),
+        ),
+        SizedBox(width: compact ? 10 : 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                  fontSize: compact ? 19 : null,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: _warnaTeksRedup, height: 1.25),
+              ),
+            ],
+          ),
+        ),
+        if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+      ],
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  const SectionTitle({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: _warnaPrimer.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(_radiusKartu),
+          ),
+          child: Icon(icon, color: _warnaPrimerGelap, size: 19),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: _warnaTeksUtama,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: _warnaTeksRedup, height: 1.25),
+              ),
+            ],
+          ),
+        ),
+        if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+      ],
+    );
+  }
+}
+
+class MetricTile extends StatelessWidget {
+  const MetricTile({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+    this.compact = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final small = layarXxs(context) || compact;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(small ? 10 : 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: _warnaGaris),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: small ? 34 : 38,
+            height: small ? 34 : 38,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.11),
+              borderRadius: BorderRadius.circular(_radiusKartu),
+            ),
+            child: Icon(icon, color: color, size: small ? 18 : 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _warnaTeksRedup,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _warnaTeksUtama,
+                    fontWeight: FontWeight.w900,
+                    fontSize: small ? 14 : 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttendanceHero extends StatelessWidget {
+  const _AttendanceHero({
+    required this.status,
+    required this.masuk,
+    required this.pulang,
+    required this.loading,
+  });
+
+  final String status;
+  final String masuk;
+  final String pulang;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = layarXxs(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(compact ? 14 : 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_warnaPrimerGelap, _warnaPrimer, _warnaBiru],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              StatusChip(status: status, onDark: true),
+              const Spacer(),
+              if (loading)
+                const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            statusLabel(status),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+              fontSize: compact ? 22 : null,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Catatan presensi untuk ${formatTanggalPendek(DateTime.now())}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.82),
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ResponsivePair(
+            first: _HeroTime(icon: Icons.login, label: 'Masuk', value: masuk),
+            second: _HeroTime(
+              icon: Icons.logout,
+              label: 'Pulang',
+              value: pulang,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroTime extends StatelessWidget {
+  const _HeroTime({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.78),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LocationStatusPill extends StatelessWidget {
+  const LocationStatusPill({
+    super.key,
+    required this.insideRadius,
+    required this.mocked,
+  });
+
+  final bool? insideRadius;
+  final bool mocked;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = mocked
+        ? 'Ditolak'
+        : insideRadius == null
+        ? 'Menunggu'
+        : insideRadius!
+        ? 'Valid'
+        : 'Di Luar';
+    final color = mocked || insideRadius == false
+        ? const Color(0xFFB91C1C)
+        : insideRadius == null
+        ? _warnaTeksRedup
+        : _warnaPrimer;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class InlineNotice extends StatelessWidget {
+  const InlineNotice({
+    super.key,
+    required this.icon,
+    required this.message,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String message;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.09),
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LeaveTypeChip extends StatelessWidget {
+  const LeaveTypeChip({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      showCheckmark: false,
+      selected: selected,
+      onSelected: (_) => onSelected(),
+      avatar: Icon(icon, size: 18),
+      label: Text(label),
+      labelStyle: TextStyle(
+        color: selected ? _warnaPrimerGelap : _warnaTeksUtama,
+        fontWeight: FontWeight.w800,
+      ),
+      selectedColor: _warnaPrimer.withValues(alpha: 0.13),
+      backgroundColor: Colors.white,
+      side: BorderSide(color: selected ? _warnaPrimer : _warnaGaris),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_radiusKartu),
+      ),
+    );
+  }
+}
+
+class DocumentTile extends StatelessWidget {
+  const DocumentTile({super.key, required this.name, required this.attached});
+
+  final String name;
+  final bool attached;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: attached
+            ? _warnaPrimer.withValues(alpha: 0.08)
+            : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: attached ? _warnaPrimer : _warnaGaris),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            attached ? Icons.description_outlined : Icons.upload_file_outlined,
+            color: attached ? _warnaPrimer : _warnaTeksRedup,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: attached ? _warnaPrimerGelap : _warnaTeksRedup,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SubmissionCard extends StatelessWidget {
+  const SubmissionCard({super.key, required this.item});
+
+  final Map<String, dynamic> item;
+
+  @override
+  Widget build(BuildContext context) {
+    final jenis = item['jenis']?.toString() ?? '-';
+    final status = item['status']?.toString() ?? 'menunggu';
+    final mulai = item['tanggal_mulai']?.toString() ?? '-';
+    final selesai = item['tanggal_selesai']?.toString() ?? '-';
+    final alasan = item['alasan']?.toString() ?? '-';
+
+    return Panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              StatusChip(status: status),
+              Text(
+                statusLabel(jenis),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: _warnaTeksUtama,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(
+                Icons.date_range_outlined,
+                size: 16,
+                color: _warnaTeksRedup,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '$mulai s/d $selesai',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _warnaTeksRedup,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(alasan, style: const TextStyle(height: 1.35)),
+        ],
+      ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  const EmptyState({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Panel(
+      child: Column(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: _warnaBiru.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(_radiusKartu),
+            ),
+            child: Icon(icon, color: _warnaBiru),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              color: _warnaTeksUtama,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: _warnaTeksRedup, height: 1.35),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class HistoryCard extends StatelessWidget {
+  const HistoryCard({super.key, required this.item});
+
+  final Map<String, dynamic> item;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = layarXxs(context);
+    final content = _HistorySummary(item: item);
+    final chip = StatusChip(status: item['status']?.toString() ?? '');
+
+    return Panel(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 4,
+            height: compact ? 76 : 54,
+            decoration: BoxDecoration(
+              color: statusColor(item['status']?.toString() ?? ''),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [content, const SizedBox(height: 10), chip],
+                  )
+                : Row(
+                    children: [
+                      Expanded(child: content),
+                      const SizedBox(width: 8),
+                      chip,
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileHero extends StatelessWidget {
+  const ProfileHero({super.key, required this.user, required this.teacher});
+
+  final Map<String, dynamic> user;
+  final Map<String, dynamic> teacher;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = layarXxs(context);
+    final nama = user['nama']?.toString() ?? 'Guru';
+    final email = user['email']?.toString() ?? '-';
+    final mapel = teacher['mata_pelajaran']?.toString() ?? 'Mata pelajaran';
+
+    return Container(
+      padding: EdgeInsets.all(compact ? 14 : 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_warnaBiru, _warnaPrimer],
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: compact ? 52 : 58,
+            height: compact ? 52 : 58,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: const Image(
+              image: AssetImage(_assetAvatarPlaceholder),
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nama,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                    fontSize: compact ? 19 : null,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.82),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    mapel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1347,15 +2386,15 @@ class _HistorySummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          item['tanggal'] as String,
+          item['tanggal']?.toString() ?? '-',
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 4),
         Text(
-          '${formatIsoTime(item['jam_masuk_pada'] as String?)} - ${formatIsoTime(item['jam_pulang_pada'] as String?)}',
+          '${formatIsoTime(item['jam_masuk_pada']?.toString())} - ${formatIsoTime(item['jam_pulang_pada']?.toString())}',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: Color(0xFF64748B)),
+          style: const TextStyle(color: _warnaTeksRedup),
         ),
       ],
     );
@@ -1616,16 +2655,37 @@ class ResponsivePair extends StatelessWidget {
 }
 
 class Panel extends StatelessWidget {
-  const Panel({super.key, required this.child});
+  const Panel({
+    super.key,
+    required this.child,
+    this.padding,
+    this.backgroundColor = _warnaPanel,
+    this.borderColor = _warnaGaris,
+  });
 
   final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final Color backgroundColor;
+  final Color borderColor;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(_radiusKartu),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.035),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: EdgeInsets.all(layarXxs(context) ? 12 : 16),
+        padding: padding ?? EdgeInsets.all(layarXxs(context) ? 12 : 16),
         child: child,
       ),
     );
@@ -1645,7 +2705,7 @@ class LabeledValue extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+          style: const TextStyle(fontSize: 12, color: _warnaTeksRedup),
         ),
         const SizedBox(height: 2),
         Text(
@@ -1673,7 +2733,7 @@ class ErrorBox extends StatelessWidget {
       padding: EdgeInsets.all(compact ? 10 : 12),
       decoration: BoxDecoration(
         color: const Color(0xFFFEF2F2),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(_radiusKartu),
         border: Border.all(color: const Color(0xFFFECACA)),
       ),
       child: Row(
@@ -1728,41 +2788,82 @@ void tampilkanNotifikasi(
     );
 }
 
+Future<bool> konfirmasiTindakan(
+  BuildContext context, {
+  required String judul,
+  required String pesan,
+  required String labelSetuju,
+  required IconData ikon,
+}) async {
+  return await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            icon: Icon(ikon, color: _warnaPrimerGelap),
+            title: Text(judul),
+            content: Text(pesan),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Batal'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(labelSetuju),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
+}
+
 class StatusChip extends StatelessWidget {
-  const StatusChip({super.key, required this.status});
+  const StatusChip({super.key, required this.status, this.onDark = false});
 
   final String status;
+  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (status) {
-      'hadir' => const Color(0xFF047857),
-      'terlambat' => const Color(0xFFB45309),
-      'menunggu' => const Color(0xFF475569),
-      'disetujui' => const Color(0xFF047857),
-      'ditolak' => const Color(0xFFB91C1C),
-      'izin' || 'sakit' || 'cuti' => const Color(0xFF0369A1),
-      _ => const Color(0xFF64748B),
-    };
+    final color = statusColor(status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
+        color: onDark
+            ? Colors.white.withValues(alpha: 0.16)
+            : color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
+        border: onDark
+            ? Border.all(color: Colors.white.withValues(alpha: 0.20))
+            : null,
       ),
       child: Text(
         statusLabel(status),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w700,
+          color: onDark ? Colors.white : color,
+          fontWeight: FontWeight.w900,
           fontSize: 12,
         ),
       ),
     );
   }
+}
+
+Color statusColor(String status) {
+  return switch (status) {
+    'hadir' => const Color(0xFF047857),
+    'terlambat' => const Color(0xFFB45309),
+    'menunggu' => const Color(0xFF475569),
+    'disetujui' => const Color(0xFF047857),
+    'ditolak' => const Color(0xFFB91C1C),
+    'izin' || 'sakit' || 'cuti' => const Color(0xFF0369A1),
+    'alpha' => const Color(0xFFB91C1C),
+    _ => _warnaTeksRedup,
+  };
 }
 
 String statusLabel(String status) {
@@ -1794,6 +2895,56 @@ String dateOnly(DateTime value) {
 
 String monthOnly(DateTime value) {
   return '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}';
+}
+
+String formatTanggalLengkap(DateTime value) {
+  const hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  const bulan = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
+  return '${hari[value.weekday - 1]}, ${value.day} ${bulan[value.month - 1]} ${value.year}';
+}
+
+String formatTanggalPendek(DateTime value) {
+  const bulan = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Agu',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+  ];
+  return '${value.day} ${bulan[value.month - 1]} ${value.year}';
+}
+
+String inisialNama(String value) {
+  final parts = value
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) return 'G';
+  if (parts.length == 1) return parts.first.characters.first.toUpperCase();
+  return '${parts.first.characters.first}${parts.last.characters.first}'
+      .toUpperCase();
 }
 
 int haversineMeters(
