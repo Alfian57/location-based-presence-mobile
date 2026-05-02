@@ -74,4 +74,34 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'Masuk'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('responsive pair stacks on narrow phone screens', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const firstKey = Key('first-responsive-item');
+    const secondKey = Key('second-responsive-item');
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ResponsivePair(
+            first: SizedBox(key: firstKey, height: 48),
+            second: SizedBox(key: secondKey, height: 48),
+          ),
+        ),
+      ),
+    );
+
+    final firstTop = tester.getTopLeft(find.byKey(firstKey));
+    final secondTop = tester.getTopLeft(find.byKey(secondKey));
+    final firstSize = tester.getSize(find.byKey(firstKey));
+
+    expect(secondTop.dy, greaterThan(firstTop.dy));
+    expect(firstSize.width, 390);
+  });
 }

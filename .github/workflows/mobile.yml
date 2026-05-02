@@ -40,6 +40,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Prepare env file
+        run: cp .env.example .env
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -71,17 +74,20 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build release APK
+      - name: Prepare env file
         env:
           MOBILE_API_BASE_URL: ${{ vars.MOBILE_API_BASE_URL }}
         run: |
           # Boleh diisi domain root, /api, atau /api/mobile.
           # Aplikasi akan menormalkan nilai ini ke endpoint /api/mobile.
           API_BASE_URL="${MOBILE_API_BASE_URL:-https://example.com/api/mobile}"
-          flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
+          printf 'API_BASE_URL=%s\n' "$API_BASE_URL" > .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
 
       - name: Resolve release metadata
         id: release

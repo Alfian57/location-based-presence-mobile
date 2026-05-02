@@ -19,7 +19,9 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private val channelName = "presensi/device"
     private val pickDocumentRequest = 4100
+    private val notificationPermissionRequest = 7102
     private var pendingPickResult: MethodChannel.Result? = null
+    private var pendingNotificationPermissionResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -42,6 +44,7 @@ class MainActivity : FlutterActivity() {
                     preferences().edit().remove(key).apply()
                     result.success(true)
                 }
+                "requestNotificationPermission" -> requestNotificationPermission(result)
                 "pickDocument" -> pickDocument(result)
                 else -> result.notImplemented()
             }
@@ -96,6 +99,35 @@ class MainActivity : FlutterActivity() {
         )
     }
 
+    private fun requestNotificationPermission(result: MethodChannel.Result) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            result.success(true)
+            return
+        }
+
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            result.success(true)
+            return
+        }
+
+        if (pendingNotificationPermissionResult != null) {
+            result.error("busy", "Permintaan izin notifikasi masih berjalan", null)
+            return
+        }
+
+        pendingNotificationPermissionResult = result
+        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), notificationPermissionRequest)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != notificationPermissionRequest) return
+
+        val result = pendingNotificationPermissionResult
+        pendingNotificationPermissionResult = null
+        result?.success(grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+    }
+
     private fun pickDocument(result: MethodChannel.Result) {
         if (pendingPickResult != null) {
             result.error("busy", "Pemilihan dokumen masih berjalan", null)
@@ -106,6 +138,7 @@ class MainActivity : FlutterActivity() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/pdf", "image/jpeg", "image/png"))
         }
         startActivityForResult(intent, pickDocumentRequest)
     }
